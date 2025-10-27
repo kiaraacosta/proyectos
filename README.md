@@ -25,7 +25,7 @@ El sitio web se despliega automáticamente a GitHub Pages mediante GitHub Action
 proyectos/
 └── SiempreBellaWeb/
     └── Pagina/
-        ├── SiempreBella.html
+        ├── index.html
         ├── assets/
         ├── css/
         └── js/
