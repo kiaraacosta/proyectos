@@ -1,0 +1,376 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Para Kev — Flipbook Romántico</title>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Italiana&family=Playfair+Display:ital,wght@1,400;1,700&display=swap" rel="stylesheet">
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg:#f9f5f1;
+      --paper:#fffdf8;
+      --ink:#362c28;
+      --accent:#b85b60;
+      --shadow:0 20px 50px rgba(54,44,40,0.25);
+      --page-shadow:linear-gradient(90deg,rgba(0,0,0,0.1),rgba(0,0,0,0.02));
+    }
+
+    body{
+      margin:0;
+      min-height:100vh;
+      background:var(--bg);
+      font-family:'Italiana',serif;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      padding:1rem;
+      color:var(--ink);
+    }
+
+    .flipbook{
+      width:148mm; /* A5 */
+      height:210mm; /* A5 */
+      perspective:2000px;
+      position:relative;
+      margin-bottom:1.5rem;
+    }
+
+    .pages{
+      position:absolute;
+      inset:0;
+      transform-style:preserve-3d;
+    }
+
+    .page{
+      position:absolute;
+      inset:0;
+      background:var(--paper);
+      border-radius:12px;
+      box-shadow:var(--shadow), inset 0 0 15px rgba(0,0,0,0.05);
+      padding:2rem 2.2rem;
+      display:flex;
+      flex-direction:column;
+      justify-content:flex-start;
+      align-items:center;
+      transform-origin:left center;
+      backface-visibility:hidden;
+      border:1px solid rgba(0,0,0,0.08);
+      overflow:hidden;
+      transition:transform .6s cubic-bezier(.4,.2,.2,1), box-shadow .4s ease;
+    }
+
+    .page::after{
+      content:'';
+      position:absolute;
+      top:0;right:0;bottom:0;
+      width:8%;
+      background:var(--page-shadow);
+      opacity:.4;
+      pointer-events:none;
+      border-radius:0 12px 12px 0;
+    }
+
+    .page.flipped{
+      transform:rotateY(-180deg);
+      box-shadow:0 12px 40px rgba(0,0,0,0.15);
+    }
+
+    .cover-content{
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      align-items:center;
+      height:100%;
+      text-align:center;
+      padding:0 1rem;
+    }
+
+    .cover-content img, .closing-content img{
+      max-width:70%;
+      border-radius:12px;
+      box-shadow:0 14px 35px rgba(0,0,0,0.25);
+      margin-bottom:1.8rem;
+      transition:transform .3s ease;
+    }
+
+    .cover-content img:hover, .closing-content img:hover{
+      transform:scale(1.04);
+    }
+
+    .cover-content .title{
+      font-family:'Playfair Display',serif;
+      font-style:italic;
+      font-size:2.2rem;
+      color:var(--accent);
+      margin-bottom:.5rem;
+    }
+
+    .cover-content .subtitle{
+      font-family:'Playfair Display',serif;
+      font-style:italic;
+      font-size:1.3rem;
+      color:var(--ink);
+      margin-bottom:2rem;
+    }
+
+    .cover-content .author{
+      font-family:'Italiana',serif;
+      font-size:1.1rem;
+      color:var(--accent);
+      margin-top:auto;
+    }
+
+    .text{
+      font-family:'Italiana',serif;
+      font-size:1.1rem;
+      line-height:1.95;
+      text-align:justify;
+      color:var(--ink);
+      font-weight:700;
+      overflow-wrap:break-word;
+      flex:1;
+      width:100%;
+      display:flex;
+      flex-direction:column;
+      justify-content:flex-start;
+      padding:0 1.2rem;
+    }
+
+    .text p{
+      margin-bottom:1.6rem;
+    }
+
+    .closing-content{
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      align-items:center;
+      height:100%;
+      width:100%;
+      text-align:center;
+    }
+
+    .closing-content img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      border-radius:12px;
+    }
+
+    .message{
+      font-family:'Playfair Display',serif;
+      font-style:italic;
+      font-size:1.4rem;
+      color:var(--accent);
+      margin-top:1.5rem;
+      text-align:center;
+    }
+
+    .num{
+      text-align:center;
+      margin-top:1rem;
+      font-weight:700;
+      color:var(--accent);
+      font-size:1rem;
+    }
+
+    .controls{
+      display:flex;
+      gap:1rem;
+      justify-content:center;
+      margin-bottom:1rem;
+    }
+
+    .nav-btn{
+      background:#fff;
+      border:1px solid rgba(0,0,0,0.07);
+      padding:.6rem 1rem;
+      border-radius:999px;
+      font-weight:600;
+      color:var(--ink);
+      cursor:pointer;
+      box-shadow:0 12px 30px rgba(0,0,0,0.12);
+      transition:transform .15s;
+    }
+
+    .nav-btn:hover{transform:translateY(-3px);}
+    .nav-btn:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+    .tip{
+      font-size:.85rem;
+      color:#7a6460;
+      text-align:center;
+      margin-bottom:1rem;
+    }
+
+    a.page-link{
+      color:var(--accent);
+      text-decoration:none;
+      display:block;
+      margin:0.5rem 0;
+      font-weight:500;
+    }
+
+    a.page-link:hover{text-decoration:underline;}
+  </style>
+</head>
+<body>
+
+<div class="flipbook" id="flipbook" aria-label="Libro romántico interactivo">
+  <div class="pages" id="pages"></div>
+</div>
+
+<div class="controls" role="toolbar" aria-label="Navegación">
+  <button class="nav-btn" id="prev" aria-label="Página anterior">Anterior</button>
+  <button class="nav-btn" id="next" aria-label="Página siguiente">Siguiente</button>
+</div>
+<div class="tip">Usa los botones o flechas del teclado ← →</div>
+
+<script>
+(function(){
+  const textoCompleto = `Kev,
+
+Hay algo que siempre me viene a la cabeza cuando pienso en nosotros, y es esa frase que me repetía sin querer: “con él, jamás”. No porque no te quisiera, no porque no confiara en vos, sino justamente por lo contrario. Porque vos eras la persona que más me conocía, la que sabía exactamente cómo soy cuando estoy bien, cuando estoy mal, cuando me patean el ego y cuando me tiembla el corazón. Vos me viste entera, en todas mis versiones, y por eso yo pensaba que jamás te ibas a fijar en mí de esa manera. Porque ¿cómo alguien que lo sabe todo de mí, absolutamente todo, podría elegirme así de fuerte?
+
+Siempre pensé que eras demasiado para mí. No lo digo desde el drama barato, sino desde esa parte mía que por mucho tiempo no se sintió suficiente. Vos sabés las cosas que me mandé, los errores que arrastro, las cicatrices que me acompañan, las formas en las que me dejé lastimar, los momentos en los que me dejé tratar como si fuera cualquier cosa. Y yo misma me lo creí. Me creí que no valía tanto. Me creí que amar no era algo para mí, que todo lo que podía esperar eran sobras disfrazadas de cariño.
+
+Y entonces apareciste vos. O mejor dicho, apareciste de una manera distinta. Porque siempre estuviste, pero un día empezaste a mirarme de una forma que me descolocó. Una forma que me dio miedo, sinceramente, porque cuando alguien ve todo lo que sos, lo bueno y lo que te avergüenza, lo lindo y lo roto, y aun así se queda… eso asusta. Asusta porque no estamos acostumbrados a que alguien nos quiera sin condiciones raras, sin juegos, sin segundas intenciones.
+
+Me preguntaste más de una vez qué me pasaba. Y la verdad es que me pasaba todo. Me pasaba que por primera vez alguien me veía y no me juzgaba. Me pasaba que vos no tratabas de cambiarme. Me pasaba que vos sabías mis errores del pasado y no los usabas como arma. Me pasaba que me cuidabas de una manera que no conocía. Me pasaba que me empezaba a sentir querida sin tener que mendigar migajas. Me pasaba que no tenía que demostrarte nada para que te quedaras.
+
+Y ahí me di cuenta de lo mucho que me dolía lo que había aceptado antes. De cómo yo misma me había convencido de que merecía poco. De que amar era sinónimo de doler. De que entregarme era lo mismo que destruirme. Hasta que vos llegaste con esa calma tuya, con esa forma tan tuya de hacerme sentir que soy suficiente incluso en mis días más complicados.
+
+Kev, quiero pedirte perdón. No por ser quien soy, sino por las veces en las que mis miedos me hacen actuar desde un lugar que no tiene nada que ver con lo que siento por vos. A veces reacciono mal, a veces me cierro, a veces digo cosas que no representan lo que realmente siento. A veces tengo miedo, y ese miedo me traiciona. Pero no confundas jamás mis errores con falta de amor. Lo que siento por vos es grande, profundo y honesto. No me sale siempre perfecto, pero es real.
+
+Sé que no soy fácil. Sé que tengo días donde me vuelvo un caos. Sé que arrastro inseguridades que me hacen dudar de mí misma. Pero con vos estoy aprendiendo algo que nunca pude aprender antes: que el amor no tiene que ser guerra para ser verdadero. Que no tengo que romperme para que alguien me quiera. Que no necesito achicarme para encajar en vos. Que puedo ser yo, entera, sin miedo a que te vayas.
+
+Con vos pasó algo que no me esperaba: me sentí amada de verdad. No usada, no reemplazable, no temporal. Amada. Sentí que te importo, que me cuidás, que no me mirás como si fuera una carga, sino como alguien que elegís todos los días aunque no lo digas en voz alta. Y eso, Kev… eso me devolvió partes mías que pensé que no iba a recuperar nunca.
+
+Hay algo que creo que nunca dije con la claridad con la que lo siento: sos mi lugar seguro. No perfecto, no idealizado, no de película. Seguro. El lugar donde puedo ser yo sin miedo a que algo explote. El lugar donde puedo llorar, reírme como una nena, enojarme, hablar de cualquier cosa, y aun así sé que no te vas a ir. El lugar donde puedo abrirme sin temblar por dentro.
+
+Te amo. Y no lo digo como un cliché, ni como una frase repetida. Te amo con la parte de mí que todavía está aprendiendo a confiar. Te amo con la parte de mí que se cree poco, pero que con vos empieza a creer que sí puede merecer algo bueno. Te amo porque me hacés sentir suficiente. Porque cuando me mirás siento que me ves, de verdad. Siento que no tengo que esconder nada. Siento que no tengo que competir con nadie ni ganarme un lugar que ya es mío.
+
+Gracias por quedarte. Gracias por tener paciencia incluso cuando no lo merezco tanto. Gracias por cada vez que me abrazaste cuando mi cabeza iba más rápido que mis palabras. Gracias por hacerme sentir que pertenecemos a algo lindo. Gracias por darme un amor que nunca pensé que iba a conocer, un amor que no me desgasta, un amor que me sostiene.
+
+Hoy te elijo, Kev. Y lo digo con una certeza que no me había pasado antes. Te elijo porque a tu lado soy feliz de verdad. Te elijo porque incluso en mis días oscuros vos me encontrás. Te elijo porque no sos solo mi mejor amigo ni solo mi novio: sos mi persona. Esa persona que llegó cuando yo ya no esperaba nada y me mostró que todavía había algo bueno guardado para mí.
+
+No sé qué va a venir en el futuro, pero sí sé lo que quiero ahora: seguir caminando con vos. Seguir creciendo, seguir aprendiendo, seguir amando mejor. Porque si algo tengo claro es que lo que siento por vos no es cualquier cosa. Lo que siento por vos es amor. Del real. Del que te marca. Del que no se olvida.`;
+
+  const paragraphs = textoCompleto.split('\n\n');
+
+  const pagesData = [
+    {type:'cover', title:'Para Kev', subtitle:'Un pedacito de lo que siento por vos', img:'img/amor.jpg', author:'Kiara'},
+    {type:'index', items:[
+      'Cuando todo empezó',
+      'Mis inseguridades',
+      'Tu llegada distinta',
+      'Sentirme vista',
+      'Aprendiendo a confiar',
+      'Perdón y amor',
+      'Aprendiendo a ser yo',
+      'Amada de verdad',
+      'Mi lugar seguro',
+      'Te Amo Kev'
+    ]}
+  ];
+
+  // Dividir el texto en páginas
+  let tempContent = '';
+  let paraCount = 0;
+  paragraphs.forEach((p,i)=>{
+    tempContent += `<p>${p}</p>`;
+    paraCount++;
+    if(paraCount === 2 || i === paragraphs.length-1){
+      pagesData.push({type:'text', content: tempContent});
+      tempContent = '';
+      paraCount = 0;
+    }
+  });
+
+  // Página 8 con mensaje "te amo, Kiara."
+  pagesData.push({type:'text', content:`<div class="message">te amo, Kiara.</div>`});
+
+  // Contraportada página 9 solo imagen
+  pagesData.push({type:'closing', content:`<div class="closing-content"><img src="img/nosotros.jpeg" alt="Nosotros"></div>`});
+
+  const pagesEl = document.getElementById('pages');
+  pagesData.forEach((t,i)=>{
+    const pg = document.createElement('article');
+    pg.className='page';
+    pg.dataset.index=i;
+    pg.style.zIndex = pagesData.length - i;
+
+    if(t.type === 'cover'){
+      pg.innerHTML = `<div class="cover-content">
+        <div class="title">${t.title}</div>
+        <div class="subtitle">${t.subtitle}</div>
+        <img src="${t.img}" alt="Portada">
+        <div class="author">${t.author}</div>
+      </div>`;
+    } else if(t.type === 'index'){
+      let links = '';
+      t.items.forEach((item,j)=>{
+        links += `<a href="#" class="page-link" data-page="${j+2}">${item}</a>`;
+      });
+      pg.innerHTML = `<div class="text"><h3>Índice</h3>${links}</div>`;
+    } else if(t.type === 'text'){
+      pg.innerHTML = `<div class="text">${t.content}</div>`;
+    } else if(t.type === 'closing'){
+      pg.innerHTML = t.content;
+    }
+
+    pg.innerHTML += `<div class="num">${i+1}</div>`;
+    pagesEl.appendChild(pg);
+  });
+
+  let current = 0;
+  const prevBtn = document.getElementById('prev');
+  const nextBtn = document.getElementById('next');
+
+  function apply(){
+    document.querySelectorAll('.page').forEach(p=>{
+      const idx = +p.dataset.index;
+      if(idx < current){ p.classList.add('flipped'); p.style.pointerEvents='none'; }
+      else { p.classList.remove('flipped'); p.style.pointerEvents='auto'; }
+      p.style.zIndex = (idx < current) ? idx : (1000 - idx);
+    });
+    prevBtn.disabled = current===0;
+    nextBtn.disabled = current===pagesData.length-1;
+  }
+
+  function animatePage(fwd){
+    apply();
+    const top = document.querySelector(`.page[data-index='${current}']`);
+    if(top){
+      top.style.transition='transform .6s cubic-bezier(.4,.2,.2,1)';
+      top.style.transform=`translateZ(0) rotateY(-6deg) translateX(-6px)`;
+      setTimeout(()=>{ top.style.transform=''; },400);
+    }
+  }
+
+  function next(){ if(current < pagesData.length-1){ current++; animatePage(true); } }
+  function prev(){ if(current > 0){ current--; animatePage(true); } }
+  prevBtn.addEventListener('click', prev);
+  nextBtn.addEventListener('click', next);
+  window.addEventListener('keydown', e=>{ if(e.key==='ArrowRight') next(); if(e.key==='ArrowLeft') prev(); });
+
+  document.addEventListener('click', e=>{
+    if(e.target.matches('.page-link')){
+      e.preventDefault();
+      let target = parseInt(e.target.dataset.page);
+      if(!Number.isFinite(target)) return;
+      current = Math.max(0, Math.min(target, pagesData.length-1));
+      animatePage(true);
+    }
+  });
+
+  apply();
+})();
+</script>
+
+</body>
+</html>
